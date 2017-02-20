@@ -9,6 +9,7 @@ what's going on.
 import time
 from sys import stdout
 import ncurses as nc
+from psyexp import utils
 
 
 def present_stimulus(stimulus, duration=3600000, window_obj, **kwargs):
@@ -17,14 +18,15 @@ def present_stimulus(stimulus, duration=3600000, window_obj, **kwargs):
     stdout.write("\r{}".format(stimulus))
     stdout.flush()
     response = ""
-    starttime = endtime = time.clock()
-    while endtime < starttime + duration:
-        key_pressed = window_obj.getkey()
-        endtime = time.clock()
-        if key_pressed in allowed_keys:
-            response = key_pressed
-            break
-    rt = endtime - starttime
+    response, rt = utils.handle_buttonpress(allowed_keys, duration, window_obj)
+    # starttime = endtime = time.clock()
+    # while endtime < starttime + duration:
+    #     key_pressed = window_obj.getkey()
+    #     endtime = time.clock()
+    #     if key_pressed in allowed_keys:
+    #         response = key_pressed
+    #         break
+    # rt = endtime - starttime
     # Overwrite the stimulus:
     stdout.write("\r"+" "*len(stimulus))
     stdout.flush()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Work in progress. Goal is to write it somewhat functionally.
+Present auditory stimuli. WIP.
 """
 
 import simpleaudio as sa
