@@ -4,14 +4,12 @@
 Work in progress. Goal is to write it somewhat functionally.
 """
 
-# import wave
 import simpleaudio as sa
 import time
-# from sys import stdout
 import random as rd
 
 
-def load_stims(filenames, shuffle=False):
+def load_audio_stims(filenames, shuffle=False):
     rd.shuffle(filenames) if shuffle else None
     return [sa.WaveObject.from_wave_file(fp) for fp in filenames]
 
