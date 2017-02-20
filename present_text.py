@@ -15,17 +15,20 @@ def present_stimulus(stimulus, duration):
     stdout.write("\r{}".format(stimulus))
     stdout.flush()
     time.sleep(duration)
+    # Overwrite the stimulus:
+    stdout.write("\r"+" "*len(stimulus))
+    stdout.flush()
 
 
-# def experiment(stimuli, trial_dur, iti):
-#     iti /= 1000.0
-#     overwrite = " "*max([len(stim) for stim in stimuli])
-#     for stim in stimuli:
-#         present_stimulus(stim, trial_dur)
-#         stdout.write("\r{}".format(overwrite))
-#         stdout.flush()
-#         time.sleep(iti)
-#     stdout.write("\n")
-#
-# stims = ["hello", "world", "colorless", "green", "ideas", "sleep", "furiously"]
-# experiment(stims, 500, 250)
+def experiment(stimuli, trial_dur, iti):
+    iti /= 1000.0
+    # overwrite = " "*max([len(stim) for stim in stimuli])
+    for stim in stimuli:
+        present_stimulus(stim, trial_dur)
+        # stdout.write("\r{}".format(overwrite))
+        # stdout.flush()
+        time.sleep(iti)
+    stdout.write("\n")
+
+stims = ["hello", "world", "colorless", "green", "ideas", "sleep", "furiously"]
+experiment(stims, 500, 250)
