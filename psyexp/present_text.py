@@ -6,27 +6,20 @@ will be expanded, of course, but for now I'm just getting the feel for
 what's going on.
 """
 
-import time
+# import time
 from sys import stdout
-import ncurses as nc
-from psyexp import utils
+# import ncurses as nc
+# from .utils import *
+from __init__ import utils
 
 
-def present_stimulus(stimulus, duration=3600000, window_obj, **kwargs):
+def present_stimulus(stimulus, window_obj, duration=3600000, **kwargs):
     allowed_keys = kwargs.get("allowed_keys", [])
     duration /= 1000.0
     stdout.write("\r{}".format(stimulus))
     stdout.flush()
     response = ""
     response, rt = utils.handle_buttonpress(allowed_keys, duration, window_obj)
-    # starttime = endtime = time.clock()
-    # while endtime < starttime + duration:
-    #     key_pressed = window_obj.getkey()
-    #     endtime = time.clock()
-    #     if key_pressed in allowed_keys:
-    #         response = key_pressed
-    #         break
-    # rt = endtime - starttime
     # Overwrite the stimulus:
     stdout.write("\r"+" "*len(stimulus))
     stdout.flush()
@@ -42,5 +35,6 @@ def present_stimulus(stimulus, duration=3600000, window_obj, **kwargs):
 #         time.sleep(iti)
 #     stdout.write("\n")
 #
-# stims = ["hello", "world", "colorless", "green", "ideas", "sleep", "furiously"]
+# stims = ["hello", "world", "colorless", "green", "ideas", "sleep",
+#   "furiously"]
 # experiment(stims, 500, 250)
