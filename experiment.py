@@ -15,3 +15,5 @@ def task(trials, **kwargs):
     iti = rd.gauss(jitter_mean, jitter_sd)/1000.0 if jitter\
         else kwargs.get("iti")/1000.0
     [[trial, time.sleep(iti)] for trial in trials]
+    # In case it becomes important to think about synchrony:
+    return True
