@@ -10,16 +10,16 @@ what's going on.
 from sys import stdout
 # import ncurses as nc
 # from .utils import *
-from __init__ import utils
+from psyexp.utils import utils
 
 
-def present_stimulus(stimulus, window_obj, duration=3600000, **kwargs):
+def text_trial(stimulus, duration=3600000, **kwargs):
     allowed_keys = kwargs.get("allowed_keys", [])
     duration /= 1000.0
     stdout.write("\r{}".format(stimulus))
     stdout.flush()
     response = ""
-    response, rt = utils.handle_buttonpress(allowed_keys, duration, window_obj)
+    response, rt = utils.handle_buttonpress(allowed_keys, duration)
     # Overwrite the stimulus:
     stdout.write("\r"+" "*len(stimulus))
     stdout.flush()
