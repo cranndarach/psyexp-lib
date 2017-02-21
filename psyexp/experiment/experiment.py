@@ -5,9 +5,10 @@ General task script.
 """
 
 import time
-from sys import stdout
+# from sys import stdout
 # import ncurses as nc
 import random as rd
+import pyglet as pyg
 
 
 def task(trials, **kwargs):
@@ -19,6 +20,18 @@ def task(trials, **kwargs):
     # win = nc.initscr()
     # win.nodelay(1)
     [[trial, time.sleep(iti)] for trial in trials]
-    stdout.write("\n")
+    # stdout.write("\n")
     # In case it becomes important to think about synchrony:
     return True
+
+
+def experiment(sequence):
+    win = pyg.window.Window()
+
+    @win.event
+    def on_draw():
+        win.clear()
+        [task for task in sequence]
+
+    # return?
+    pyg.app.run()

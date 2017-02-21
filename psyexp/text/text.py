@@ -7,22 +7,29 @@ what's going on.
 """
 
 # import time
-from sys import stdout
+# from sys import stdout
 # import ncurses as nc
 # from .utils import *
-from psyexp.utils import utils
+from psyexp.experiment.trial import Trial
+# import pyglet as pyg
 
 
-def text_trial(stimulus, duration=3600000, **kwargs):
-    allowed_keys = kwargs.get("allowed_keys", [])
-    duration /= 1000.0
-    stdout.write("\r{}".format(stimulus))
-    stdout.flush()
-    response = ""
-    response, rt = utils.handle_buttonpress(allowed_keys, duration)
+class TextTrial(Trial):
+
+    def __init__(self, stimulus, **kwargs):
+        super().__init__(**kwargs)
+
+
+# def text_trial(stimulus, duration=3600000, **kwargs):
+#     allowed_keys = kwargs.get("allowed_keys", [])
+#     duration /= 1000.0
+#     # stdout.write("\r{}".format(stimulus))
+#     # stdout.flush()
+#     response = ""
+#     response, rt = utils.handle_buttonpress(allowed_keys, duration)
     # Overwrite the stimulus:
-    stdout.write("\r"+" "*len(stimulus))
-    stdout.flush()
+    # stdout.write("\r"+" "*len(stimulus))
+    # stdout.flush()
 
 
 # def experiment(stimuli, trial_dur, iti):
