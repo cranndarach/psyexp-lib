@@ -8,7 +8,7 @@ import time
 # from sys import stdout
 # import ncurses as nc
 import random as rd
-import pyglet as pyg
+# import pyglet as pyg
 
 
 class Task:
@@ -18,8 +18,18 @@ class Task:
         self.jitter_sd = self.jitter["sd"] if self.jitter else None
         self.iti = rd.gauss(self.jitter_mean, self.jitter_sd)/1000.0 if\
             self.jitter else kwargs.get("iti")/1000.0
+        self.done = False
 
-    # Not done!!
+    def run(self):
+        [[trial.run(), time.sleep(self.iti)] for trial in self.trials]
+        self.done = True
+
+
+class Experiment:
+    def __init__(self, **kwargs):
+        # fill in formatting stuff later
+        pass
+
 
 # def task(trials, **kwargs):
 #     jitter = kwargs.get("jitter", None)
