@@ -6,7 +6,7 @@ Present auditory stimuli. WIP.
 
 # import simpleaudio as sa
 # import pygame as pyg
-from psyexp.experiment.trial import Trial
+from psyexp.experiment import Trial
 # import time
 # import random as rd
 

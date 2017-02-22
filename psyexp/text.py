@@ -7,7 +7,7 @@ what's going on.
 """
 
 # import time
-from psyexp.experiment.experiment import Trial
+from psyexp.experiment import Trial
 import pyglet as pyg
 
 
