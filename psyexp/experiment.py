@@ -10,23 +10,53 @@ import pyglet as pyg
 # from psyexp.utils.errors import MissingItiError
 
 
-class Experiment(pyg.window.Window):
+class Experiment(pyg.EventLoop):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         # fill in formatting stuff later
-        self.tasks = []
-        self.task = None
+        self.win = pyg.window.Window()
+        self.jitter_mean = None
+        self.jitter_sd = None
+        self.iti = None
 
-    def run_task(self, task):
-        self.task = task
-        self.task.run()
+    def sequence(self, members, **template):
+        # Members are trials. Contain stimuli & trial-specific info.
+        # I think it could just be pyglet objects, though they should
+        # probably be wrapped for the sake of keeping things simple.
+        # Template is the task structure. Contains ITI, allowed keys, etc.
+        # I think it could just be some kwargs (hence the ** for now).
+        #
+        # Set it up:
+        self.allowed_keys = template.get("allowed_keys", [])
+        jitter = template.get("jitter", False)
+        if jitter:
+            self.jitter_mean = template["jitter_mean"]
+            self.jitter_sd = template["jitter_sd"]
+        else:
+            self.iti = template.get("iti", 0)/1000.0
+            print("Warning: no ITI specified. Defaulting to 0.") if not \
+                self.iti else None
+        # Do the things:
+        for trial in members:
+            self.current_trial = trial
+            # etc.
+        # Clean up:
+        self.sequence_cleanup()
+
+    def sequence_cleanup(self):
+        # Add to this
+        self.allowed_keys = []
 
     def on_draw(self):
         self.clear()
 
     def on_key_press(self, symbol, modifiers):
         key = pyg.key.symbol_string(symbol)
-        self.task.handle_keypress(key)
+        if key in self.allowed_keys:
+            self.endtime = time.clock()
+            self.response = key
+            self.rt = self.endtime - self.starttime
+            # self.current_trial.stop()? self.sequence.continue-sort-of(?)
 
     def run(self):
         try:
@@ -77,8 +107,9 @@ class Task:
 class Trial:
 
     def __init__(self, **kwargs):
-        self.allowed_keys = kwargs.get("allowed_keys", [])
+        # self.allowed_keys = kwargs.get("allowed_keys", [])
         # self.task = task
+        pass
 
     def handle_keypress(self, key):
         # A task or something can call Trial.handle_keypress()
