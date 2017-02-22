@@ -12,7 +12,6 @@ class Trial:
 
     def __init__(self, **kwargs):
         self.allowed_keys = kwargs.get("allowed_keys", [])
-        self.starttime = time.clock()
         # self.task = task
 
     def handle_keypress(self, key):
@@ -21,3 +20,6 @@ class Trial:
             self.endtime = time.clock()
             self.response = key
             self.rt = self.endtime - self.starttime
+
+    def time(self):
+        self.starttime = time.clock()

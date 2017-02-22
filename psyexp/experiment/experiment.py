@@ -5,30 +5,36 @@ General task script.
 """
 
 import time
-# from sys import stdout
-# import ncurses as nc
 import random as rd
-# import pyglet as pyg
+import pyglet as pyg
 
 
 class Task:
-    def __init__(self, trials, **kwargs):
+    def __init__(self, trials, experiment, **kwargs):
         self.jitter = kwargs.get("jitter", None)
         self.jitter_mean = self.jitter["mean"] if self.jitter else None
         self.jitter_sd = self.jitter["sd"] if self.jitter else None
         self.iti = rd.gauss(self.jitter_mean, self.jitter_sd)/1000.0 if\
             self.jitter else kwargs.get("iti")/1000.0
+        self.experiment = experiment
         self.done = False
 
     def run(self):
-        [[trial.run(), time.sleep(self.iti)] for trial in self.trials]
+        [[trial.start(), self.experiment.window.clear(), time.sleep(self.iti)]
+         for trial in self.trials]
         self.done = True
 
 
 class Experiment:
     def __init__(self, **kwargs):
         # fill in formatting stuff later
-        pass
+        self.window = pyg.window.Window()
+
+        @self.window.event
+        def on_draw(self):
+            self.window.clear()
+            # idk about this:
+            # self.task.run()
 
 
 # def task(trials, **kwargs):
