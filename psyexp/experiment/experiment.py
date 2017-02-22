@@ -10,7 +10,7 @@ import pyglet as pyg
 
 
 class Task:
-    def __init__(self, trials, experiment, **kwargs):
+    def __init__(self, experiment, **kwargs):
         self.jitter = kwargs.get("jitter", None)
         self.jitter_mean = self.jitter["mean"] if self.jitter else None
         self.jitter_sd = self.jitter["sd"] if self.jitter else None
@@ -18,23 +18,42 @@ class Task:
             self.jitter else kwargs.get("iti")/1000.0
         self.experiment = experiment
         self.done = False
+        self.trials = []
+        self.trial = None
+
+    def handle_keypress(self, key):
+        self.trial.handle_keypress(key)
+
+    def run_trial(self, trial):
+        self.trial = trial
+        trial.start()
+        self.experiment.clear()
+        self.trial = None
+        time.sleep(self.iti)
 
     def run(self):
-        [[trial.start(), self.experiment.window.clear(), time.sleep(self.iti)]
-         for trial in self.trials]
+        [self.run_trial(trial) for trial in self.trials]
         self.done = True
 
 
-class Experiment:
+class Experiment(pyg.window.Window):
     def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         # fill in formatting stuff later
-        self.window = pyg.window.Window()
+        # self.window = pyg.window.Window()
+        # self.tasks = []
+        self.task = None
 
-        @self.window.event
-        def on_draw(self):
-            self.window.clear()
-            # idk about this:
-            # self.task.run()
+        # @self.window.event
+    def on_draw(self):
+        self.clear()
+
+    def on_key_press(self, symbol, modifiers):
+        key = pyg.key.symbol_string(symbol)
+        self.task.handle_keypress(key)
+
+    def run(self):
+        pyg.app.run()
 
 
 # def task(trials, **kwargs):
