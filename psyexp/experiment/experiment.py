@@ -7,44 +7,20 @@ General task script.
 import time
 import random as rd
 import pyglet as pyg
-
-
-class Task:
-    def __init__(self, experiment, **kwargs):
-        self.jitter = kwargs.get("jitter", None)
-        self.jitter_mean = self.jitter["mean"] if self.jitter else None
-        self.jitter_sd = self.jitter["sd"] if self.jitter else None
-        self.iti = rd.gauss(self.jitter_mean, self.jitter_sd)/1000.0 if\
-            self.jitter else kwargs.get("iti")/1000.0
-        self.experiment = experiment
-        self.done = False
-        self.trials = []
-        self.trial = None
-
-    def handle_keypress(self, key):
-        self.trial.handle_keypress(key)
-
-    def run_trial(self, trial):
-        self.trial = trial
-        trial.start()
-        self.experiment.clear()
-        self.trial = None
-        time.sleep(self.iti)
-
-    def run(self):
-        [self.run_trial(trial) for trial in self.trials]
-        self.done = True
+# from psyexp.utils.errors import MissingItiError
 
 
 class Experiment(pyg.window.Window):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # fill in formatting stuff later
-        # self.window = pyg.window.Window()
-        # self.tasks = []
+        self.tasks = []
         self.task = None
 
-        # @self.window.event
+    def run_task(self, task):
+        self.task = task
+        self.task.run()
+
     def on_draw(self):
         self.clear()
 
@@ -53,30 +29,65 @@ class Experiment(pyg.window.Window):
         self.task.handle_keypress(key)
 
     def run(self):
-        pyg.app.run()
+        try:
+            [self.run_task(task) for task in self.tasks]
+            pyg.app.run()
+        except:
+            pyg.app.exit()
+            raise
 
 
-# def task(trials, **kwargs):
-#     jitter = kwargs.get("jitter", None)
-#     jitter_mean = jitter["mean"] if jitter else None
-#     jitter_sd = jitter["sd"] if jitter else None
-#     iti = rd.gauss(jitter_mean, jitter_sd)/1000.0 if jitter\
-#         else kwargs.get("iti")/1000.0
-#     # win = nc.initscr()
-#     # win.nodelay(1)
-#     [[trial, time.sleep(iti)] for trial in trials]
-#     # stdout.write("\n")
-#     # In case it becomes important to think about synchrony:
-#     return True
-#
-#
-# def experiment(sequence):
-#     win = pyg.window.Window()
-#
-#     @win.event
-#     def on_draw():
-#         win.clear()
-#         [task for task in sequence]
-#
-#     # return?
-#     pyg.app.run()
+class Task:
+    def __init__(self, experiment, **kwargs):
+        self.jitter = kwargs.get("jitter", None)
+        if self.jitter:
+            self.jitter_mean = self.jitter["mean"]
+            self.jitter_sd = self.jitter["sd"]
+        else:
+            self.iti = kwargs.get("iti", 0)/1000.0
+            if not self.iti:
+                print("Warning: no ITI specified. Defaulting to 0.")
+            # except KeyError:
+            #     # Maybe make it a warning sometime.
+            #     raise MissingItiError("Please specify an inter-trial " +
+            #                           "interval (ITI) or jitter.")
+        self.experiment = experiment
+        self.done = False
+        self.trials = []
+        self.trial = None
+
+    def jitter_iti(self):
+        return rd.gauss(self.jitter_mean, self.jitter_sd)/1000.0
+
+    def handle_keypress(self, key):
+        self.trial.handle_keypress(key)
+
+    def run_trial(self, trial):
+        self.trial = trial
+        self.trial.start()
+        # self.experiment.clear()
+        # self.trial = None
+        # time.sleep(self.iti)
+
+    def run(self):
+        [[self.run_trial(trial), time.sleep(self.iti)] for trial in self.trials]
+        self.done = True
+
+
+class Trial:
+
+    def __init__(self, **kwargs):
+        self.allowed_keys = kwargs.get("allowed_keys", [])
+        # self.task = task
+
+    def handle_keypress(self, key):
+        # A task or something can call Trial.handle_keypress()
+        if key in self.allowed_keys:
+            self.endtime = time.clock()
+            self.response = key
+            self.rt = self.endtime - self.starttime
+
+    def time(self):
+        # Subclasses with run() methods should call Trial.time() to
+        # start the clock if timing is important.
+        self.starttime = time.clock()
