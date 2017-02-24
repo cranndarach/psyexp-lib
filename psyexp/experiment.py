@@ -19,6 +19,11 @@ class Experiment(pyg.EventLoop):
         self.jitter_sd = None
         self.iti = None
 
+    def add_trial(self, name, trial, **kwargs):
+        # kwargs might include the row from the stimulus df?
+        # trial = Trial(stimulus, **kwargs)
+        self.__setattr__(name, trial)
+
     def sequence(self, members, **template):
         # Members are trials. Contain stimuli & trial-specific info.
         # I think it could just be pyglet objects, though they should
@@ -37,18 +42,25 @@ class Experiment(pyg.EventLoop):
             print("Warning: no ITI specified. Defaulting to 0.") if not \
                 self.iti else None
         # Do the things:
-        for trial in members:
-            self.current_trial = trial
-            # etc.
+        for member in members:
+            # fill in
+            self.current_trial = self.__getattr__(member)
+            self.current_trial.run()  # ?
+            self.win.clear()
+            time.sleep(self.iti)
+
         # Clean up:
         self.sequence_cleanup()
 
     def sequence_cleanup(self):
         # Add to this
+        self.current_trial = None
         self.allowed_keys = []
+        self.iti = self.jitter = self.jitter_sd = self.jitter_mean = None
 
     def on_draw(self):
-        self.clear()
+        self.win.clear()
+        self.current_trial.draw()
 
     def on_key_press(self, symbol, modifiers):
         key = pyg.key.symbol_string(symbol)
@@ -56,15 +68,7 @@ class Experiment(pyg.EventLoop):
             self.endtime = time.clock()
             self.response = key
             self.rt = self.endtime - self.starttime
-            # self.current_trial.stop()? self.sequence.continue-sort-of(?)
-
-    def run(self):
-        try:
-            [self.run_task(task) for task in self.tasks]
-            pyg.app.run()
-        except:
-            pyg.app.exit()
-            raise
+            # self.current_trial.stop()?
 
 
 class Task:
@@ -106,17 +110,22 @@ class Task:
 
 class Trial:
 
-    def __init__(self, **kwargs):
-        # self.allowed_keys = kwargs.get("allowed_keys", [])
-        # self.task = task
-        pass
+    def __init__(self, stimulus, **kwargs):
+        # I'm not sure if it makes more sense to have this and
+        # make subclasses for types of trials, or to nuke trial
+        # and have Stimulus classes, or what. But rather than
+        # require people to make stims with pyglet there needs
+        # to be something better. Maybe they'll all have a stimulus
+        # attribute, but subclasses will handle it differently,
+        # and then if people want to expand on that they can use pyg.
+        self.stimulus = stimulus
 
-    def handle_keypress(self, key):
-        # A task or something can call Trial.handle_keypress()
-        if key in self.allowed_keys:
-            self.endtime = time.clock()
-            self.response = key
-            self.rt = self.endtime - self.starttime
+    # def handle_keypress(self, key):
+    #     # A task or something can call Trial.handle_keypress()
+    #     if key in self.allowed_keys:
+    #         self.endtime = time.clock()
+    #         self.response = key
+    #         self.rt = self.endtime - self.starttime
 
     def time(self):
         # Subclasses with run() methods should call Trial.time() to
