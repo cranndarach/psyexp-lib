@@ -45,10 +45,10 @@ class Experiment(pyg.EventLoop):
         for member in members:
             # fill in
             self.current_trial = self.__getattr__(member)
-            self.current_trial.run()  # ?
+            self.starttime = time.clock()
+            self.current_trial.go()  # ?
             self.win.clear()
             time.sleep(self.iti)
-
         # Clean up:
         self.sequence_cleanup()
 
@@ -120,6 +120,11 @@ class Trial:
         # and then if people want to expand on that they can use pyg.
         self.stimulus = stimulus
 
+    def go(self):
+        # Virtual ish
+        pass
+        # No pun intended
+
     # def handle_keypress(self, key):
     #     # A task or something can call Trial.handle_keypress()
     #     if key in self.allowed_keys:
@@ -127,7 +132,7 @@ class Trial:
     #         self.response = key
     #         self.rt = self.endtime - self.starttime
 
-    def time(self):
-        # Subclasses with run() methods should call Trial.time() to
-        # start the clock if timing is important.
-        self.starttime = time.clock()
+    # def time(self):
+    #     # Subclasses with run() methods should call Trial.time() to
+    #     # start the clock if timing is important.
+    #     self.starttime = time.clock()
