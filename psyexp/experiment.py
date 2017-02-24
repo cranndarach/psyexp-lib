@@ -24,7 +24,7 @@ class Experiment(pyg.EventLoop):
         # trial = Trial(stimulus, **kwargs)
         self.__setattr__(name, trial)
 
-    def sequence(self, members, **template):
+    def sequencer(self, member_names, **template):
         # Members are trials. Contain stimuli & trial-specific info.
         # I think it could just be pyglet objects, though they should
         # probably be wrapped for the sake of keeping things simple.
@@ -42,7 +42,7 @@ class Experiment(pyg.EventLoop):
             print("Warning: no ITI specified. Defaulting to 0.") if not \
                 self.iti else None
         # Do the things:
-        for member in members:
+        for member in member_names:
             # fill in
             self.current_trial = self.__getattr__(member)
             self.starttime = time.clock()
@@ -68,6 +68,9 @@ class Experiment(pyg.EventLoop):
             self.endtime = time.clock()
             self.response = key
             self.rt = self.endtime - self.starttime
+            self.win.clear()
+            # Needs a way to know to advance
+            # Something about "next"
             # self.current_trial.stop()?
 
 
@@ -109,6 +112,9 @@ class Task:
 
 
 class Trial:
+    # I think the question rn is does this actually do anything? Or is it
+    # just a template? My only thought it that it will be best to keep it
+    # to handle things with importing list properties.
 
     def __init__(self, stimulus, **kwargs):
         # I'm not sure if it makes more sense to have this and
@@ -118,7 +124,8 @@ class Trial:
         # to be something better. Maybe they'll all have a stimulus
         # attribute, but subclasses will handle it differently,
         # and then if people want to expand on that they can use pyg.
-        self.stimulus = stimulus
+        pass
+        # self.stimulus = stimulus
 
     def go(self):
         # Virtual ish

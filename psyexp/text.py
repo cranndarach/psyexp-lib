@@ -12,7 +12,6 @@ import pyglet as pyg
 
 
 class TextTrial(Trial):
-
     def __init__(self, stimulus, **kwargs):
         super().__init__(**kwargs)
         # Change the font sometime.
@@ -21,8 +20,7 @@ class TextTrial(Trial):
                                        font_size=36,
                                        anchor_x="center", anchor_y="center")
         self.duration = kwargs.get("duration", 10000)/1000.0
-        # self.task = task
 
-    def start(self):
-        self.time()
+    def go(self):
+        # self.time()
         self.stimulus.draw()
