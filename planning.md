@@ -37,7 +37,12 @@ thoughts:
 
 ```python
 list_of_stims = [...]
+other_list_of_stims = [...]
+
 exp = Experiment(...)
-task_sequence = (TypeOfTrial(...).run() for stim in list_of_stims)
-task = task_sequence.next() 
+
+first_task = (TypeOfTrial(stim, ...).run() for stim in list_of_stims)
+second_task = (TypeOfTrial(stim, ...).run() for stim in other_list_of_stims)
+
+
 ```

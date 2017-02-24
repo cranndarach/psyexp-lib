@@ -7,7 +7,7 @@ General task script.
 import time
 import random as rd
 import pyglet as pyg
-from utils import decorator
+# from utils import decorator
 
 
 class Experiment(pyg.EventLoop):
@@ -20,10 +20,10 @@ class Experiment(pyg.EventLoop):
         self.jitter_sd = None
         self.iti = None
 
-    def add_trial(self, name, trial, **kwargs):
-        # kwargs might include the row from the stimulus df?
-        # trial = Trial(stimulus, **kwargs)
-        self.__setattr__(name, trial)
+    # def add_trial(self, name, trial, **kwargs):
+    #     # kwargs might include the row from the stimulus df?
+    #     # trial = Trial(stimulus, **kwargs)
+    #     self.__setattr__(name, trial)
 
     def sequencer(self, member_names, **template):
         # Members are trials. Contain stimuli & trial-specific info.
@@ -69,13 +69,17 @@ class Experiment(pyg.EventLoop):
             self.endtime = time.clock()
             self.response = key
             self.rt = self.endtime - self.starttime
+            # Need some sort of means of handling data output.
+            # Could use some sort of functools method (e.g., a partial?)
+            # to pass the response, RT, and any relevant properties of
+            # the stimulus/task to a global data logging utility, which
+            # can then get the rest of its arguments from the task or trial?
+            # handle_trial_data(handle_all_data, self.rt, self.response)
             self.win.clear()
             # Should this indeed be a member, or should it refer to some
-            # external var?
+            # external var? Hard to imagine the latter without making people
+            # code it themselves, but the former is not very fp.
             next(self.task_gen)
-            # Needs a way to know to advance
-            # Something about "next"
-            # self.current_trial.stop()?
 
 
 class Task:
@@ -149,20 +153,36 @@ class Trial:
     #     self.starttime = time.clock()
 
 
-def task_generator(trials):
-    return (trial.go() for trial in trials)
+def task_generator(trials, **kwargs):
+    return {"gen": (trial.go() for trial in trials),
+            "template": kwargs
+            }
 
 
-@decorator
-def run_generator(gen):
+# @decorator
+def run_task(gen, template):
+    # allowed_keys = template.get("allowed_keys", [])
+    # ^ mute the warning for now. But probably do some partial
+    # to assign it to the experiment.
+    jitter = template.get("jitter", False)
+    if jitter:
+        jitter_mean = template["jitter_mean"]
+        jitter_sd = template["jitter_sd"]
+    else:
+        iti = template.get("iti", 0)/1000.0
+        print("Warning: no ITI given. Defaulting to 0.") if not iti else None
     while True:
         try:
             next(gen)
+            if jitter:
+                time.sleep(rd.gauss(jitter_mean, jitter_sd))
+            else:
+                time.sleep(iti)
         except StopIteration:
             break
 
 # They probably need better names. A task is a sequence of trials
 # and an experiment is a sequence of tasks: so run_task means to
 # run trials, and run_experiment would mean to run the tasks.
-run_task = run_generator
-run_sequence = run_generator
+# run_task = run_generator
+# run_sequence = run_generator
