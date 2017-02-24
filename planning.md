@@ -25,3 +25,19 @@ e.add_trial() # to a task? or something?
 
 Starting to think maybe making "tasks" into more like "task templates."  
 So you could have like "run this sequence of trials with this task style."
+
+## More FP
+
+Okay so now that I read the HOWTO on fp in Python, I'm getting a slightly better
+feel for how to go about this.
+
+I still might write relevant classes, but the flow can be more functional.
+
+thoughts:
+
+```python
+list_of_stims = [...]
+exp = Experiment(...)
+task_sequence = (TypeOfTrial(...).run() for stim in list_of_stims)
+task = task_sequence.next() 
+```

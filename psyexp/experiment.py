@@ -7,7 +7,7 @@ General task script.
 import time
 import random as rd
 import pyglet as pyg
-# from psyexp.utils.errors import MissingItiError
+from utils import decorator
 
 
 class Experiment(pyg.EventLoop):
@@ -15,6 +15,7 @@ class Experiment(pyg.EventLoop):
         super().__init__()
         # fill in formatting stuff later
         self.win = pyg.window.Window()
+        self.task_gen = None
         self.jitter_mean = None
         self.jitter_sd = None
         self.iti = None
@@ -69,6 +70,9 @@ class Experiment(pyg.EventLoop):
             self.response = key
             self.rt = self.endtime - self.starttime
             self.win.clear()
+            # Should this indeed be a member, or should it refer to some
+            # external var?
+            next(self.task_gen)
             # Needs a way to know to advance
             # Something about "next"
             # self.current_trial.stop()?
@@ -143,3 +147,22 @@ class Trial:
     #     # Subclasses with run() methods should call Trial.time() to
     #     # start the clock if timing is important.
     #     self.starttime = time.clock()
+
+
+def task_generator(trials):
+    return (trial.go() for trial in trials)
+
+
+@decorator
+def run_generator(gen):
+    while True:
+        try:
+            next(gen)
+        except StopIteration:
+            break
+
+# They probably need better names. A task is a sequence of trials
+# and an experiment is a sequence of tasks: so run_task means to
+# run trials, and run_experiment would mean to run the tasks.
+run_task = run_generator
+run_sequence = run_generator
