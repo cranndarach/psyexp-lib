@@ -40,13 +40,16 @@ list_of_stims = [...]
 other_list_of_stims = [...]
 
 TASK_ALLOWED_KEYS = ["Z", "/"]
-INSTRUCTIONS_ALLOWED_KEYS = ["Z", "/"]
+# INSTRUCTIONS_ALLOWED_KEYS = ["Z", "/"]
 
 exp = Experiment(...)
 
+first_task = task_generator(TypeOfTrial([stim for stim in list_of_stims])
+second_task = task_generator(TypeOfTrial([stim for stim in list_of_stims])
+
 exp.allowed_keys = TASK_ALLOWED_KEYS
-first_task = (TypeOfTrial(stim, ...).run() for stim in list_of_stims)
-second_task = (TypeOfTrial(stim, ...).run() for stim in other_list_of_stims)
+run_task(first_task)
+run_task(second_task)
 
-
+exp.run()
 ```

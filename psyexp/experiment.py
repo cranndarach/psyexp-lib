@@ -15,53 +15,11 @@ class Experiment(pyg.EventLoop):
         super().__init__()
         # fill in formatting stuff later
         self.win = pyg.window.Window()
-        self.task_gen = None
-        self.jitter_mean = None
-        self.jitter_sd = None
-        self.iti = None
         self.allowed_keys = []
-
-    # def add_trial(self, name, trial, **kwargs):
-    #     # kwargs might include the row from the stimulus df?
-    #     # trial = Trial(stimulus, **kwargs)
-    #     self.__setattr__(name, trial)
-
-    def sequencer(self, member_names, **template):
-        # Members are trials. Contain stimuli & trial-specific info.
-        # I think it could just be pyglet objects, though they should
-        # probably be wrapped for the sake of keeping things simple.
-        # Template is the task structure. Contains ITI, allowed keys, etc.
-        # I think it could just be some kwargs (hence the ** for now).
-        #
-        # Set it up:
-        self.allowed_keys = template.get("allowed_keys", [])
-        jitter = template.get("jitter", False)
-        if jitter:
-            self.jitter_mean = template["jitter_mean"]
-            self.jitter_sd = template["jitter_sd"]
-        else:
-            self.iti = template.get("iti", 0)/1000.0
-            print("Warning: no ITI specified. Defaulting to 0.") if not \
-                self.iti else None
-        # Do the things:
-        for member in member_names:
-            # fill in
-            self.current_trial = self.__getattr__(member)
-            self.starttime = time.clock()
-            self.current_trial.go()  # ?
-            self.win.clear()
-            time.sleep(self.iti)
-        # Clean up:
-        self.sequence_cleanup()
-
-    def sequence_cleanup(self):
-        # Add to this
-        self.current_trial = None
-        self.allowed_keys = []
-        self.iti = self.jitter = self.jitter_sd = self.jitter_mean = None
 
     def on_draw(self):
         self.win.clear()
+        # Consider how to do this.
         self.current_trial.draw()
 
     def on_key_press(self, symbol, modifiers):
@@ -81,39 +39,6 @@ class Experiment(pyg.EventLoop):
             # external var? Hard to imagine the latter without making people
             # code it themselves, but the former is not very fp.
             next(self.task_gen)
-
-
-class Task:
-    def __init__(self, experiment, **kwargs):
-        self.jitter = kwargs.get("jitter", None)
-        if self.jitter:
-            self.jitter_mean = self.jitter["mean"]
-            self.jitter_sd = self.jitter["sd"]
-        else:
-            self.iti = kwargs.get("iti", 0)/1000.0
-            if not self.iti:
-                print("Warning: no ITI specified. Defaulting to 0.")
-            # except KeyError:
-            #     # Maybe make it a warning sometime.
-            #     raise MissingItiError("Please specify an inter-trial " +
-            #                           "interval (ITI) or jitter.")
-        self.experiment = experiment
-        self.done = False
-        self.trials = []
-        self.trial = None
-
-    def jitter_iti(self):
-        return rd.gauss(self.jitter_mean, self.jitter_sd)/1000.0
-
-    def handle_keypress(self, key):
-        self.trial.handle_keypress(key)
-
-    def run_trial(self, trial):
-        self.trial = trial
-        self.trial.start()
-        # self.experiment.clear()
-        # self.trial = None
-        # time.sleep(self.iti)
 
 
 class Trial:
@@ -151,16 +76,21 @@ class Trial:
 
 
 def task_generator(trials, **kwargs):
+    # kwargs will probably contain something like iti or
+    # jitter params. Just pass it along.
     return {"gen": (trial.go() for trial in trials),
             "template": kwargs
             }
 
 
-# @decorator
-def run_task(gen, template):
-    # allowed_keys = template.get("allowed_keys", [])
-    # ^ mute the warning for now. But probably do some partial
-    # to assign it to the experiment.
+def run_task(*args, **kwargs):
+    # If they pass a template, use it, and if they pass
+    # a series of named arguments instead, use them.
+    template = args[1] if args else kwargs.get("template", kwargs)
+    # If they pass the generator as the first argument, use it;
+    # if they pass it as a named argument or as part of the
+    # template, use that.
+    gen = args[0] if args else template["gen"]
     jitter = template.get("jitter", False)
     if jitter:
         jitter_mean = template["jitter_mean"]
@@ -177,9 +107,5 @@ def run_task(gen, template):
                 time.sleep(iti)
         except StopIteration:
             break
-
-# They probably need better names. A task is a sequence of trials
-# and an experiment is a sequence of tasks: so run_task means to
-# run trials, and run_experiment would mean to run the tasks.
-# run_task = run_generator
-# run_sequence = run_generator
+    # Do something to output data
+    return True
