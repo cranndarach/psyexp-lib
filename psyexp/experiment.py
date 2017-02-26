@@ -19,6 +19,7 @@ class Experiment(pyg.EventLoop):
         self.jitter_mean = None
         self.jitter_sd = None
         self.iti = None
+        self.allowed_keys = []
 
     # def add_trial(self, name, trial, **kwargs):
     #     # kwargs might include the row from the stimulus df?
@@ -113,10 +114,6 @@ class Task:
         # self.experiment.clear()
         # self.trial = None
         # time.sleep(self.iti)
-
-    def run(self):
-        [[self.run_trial(trial), time.sleep(self.iti)] for trial in self.trials]
-        self.done = True
 
 
 class Trial:
