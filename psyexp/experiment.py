@@ -8,9 +8,10 @@ import time
 import random as rd
 import pyglet as pyg
 import pandas as pd
+# import numpy as np
 
 
-class Experiment(pyg.EventLoop):
+class Experiment(pyg.app.EventLoop):
     def __init__(self, **kwargs):
         super().__init__()
         # fill in formatting stuff later
@@ -19,7 +20,7 @@ class Experiment(pyg.EventLoop):
 
     def on_draw(self):
         self.win.clear()
-        self.current_trial.draw()
+        self.draw()
 
     def on_key_press(self, symbol, modifiers):
         key = pyg.key.symbol_string(symbol)
