@@ -2,11 +2,6 @@
 
 Psychology experiment library, similar idea to [PsychoPy](http://www.psychopy.org/).
 
-# def time(self):
-#     # Subclasses with run() methods should call Trial.time() to
-#     # start the clock if timing is important.
-#     self.starttime = time.clock()
-
 **Please note that this is very much a work in progress!** You won't find it
 on PyPI yet, because it is not even ready for a full release (though I do plan
 to host it there as soon as it is released). Likewise, I do plan on documenting
