@@ -36,20 +36,38 @@ I still might write relevant classes, but the flow can be more functional.
 thoughts:
 
 ```python
-list_of_stims = [...]
-other_list_of_stims = [...]
+task1_list = load_list("path/to/task1list.csv", shuffle=True)
+task2_list = load_list("path/to/task2list.csv", shuffle=True)
 
 TASK_ALLOWED_KEYS = ["Z", "/"]
-# INSTRUCTIONS_ALLOWED_KEYS = ["Z", "/"]
 
 exp = Experiment(...)
 
-first_task = task_generator(TypeOfTrial([stim for stim in list_of_stims])
-second_task = task_generator(TypeOfTrial([stim for stim in list_of_stims])
+task1_schema = text.generate_trials(task1_list, "Stimuli")
+task1 = generate_task(task1_schema)
+
+task2_schema = text.generate_trials(task2_list, "Stimuli")
+task2 = generate_task(task2_schema)
 
 exp.allowed_keys = TASK_ALLOWED_KEYS
-run_task(first_task)
-run_task(second_task)
+task1_data = run_task(task1)
+task2_data = run_task(task2)
 
 exp.run()
+
+save_data(task1_data, "path/to/data")
+save_data(task2_data, "path/to/data2")
+```
+
+If you wanted to be really fancy:
+
+```python
+# [start with loading lists, etc.]
+
+exp.allowed_keys = TASK_ALLOWED_KEYS
+task1_data = run_task(generate_task(text.generate_trials(task1_list, "Stimuli")))
+
+exp.run()
+
+save_data(task1_data, "path/to/data")
 ```

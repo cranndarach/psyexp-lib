@@ -6,9 +6,15 @@ will be expanded, of course, but for now I'm just getting the feel for
 what's going on.
 """
 
-# import time
 from psyexp.experiment import Trial
 import pyglet as pyg
+
+
+def generate_trials(stimulus_frame, stimulus_column):
+    stims = list(stimulus_frame.index.values)
+    trial_set = [TextTrial(stim, df=stimulus_frame,
+                           stimulus_col=stimulus_column) for stim in stims]
+    return trial_set
 
 
 class TextTrial(Trial):
