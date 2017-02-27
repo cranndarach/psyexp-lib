@@ -28,5 +28,4 @@ class TextTrial(Trial):
         self.duration = kwargs.get("duration", 10000)/1000.0
 
     def go(self):
-        # self.time()
         self.stimulus.draw()

@@ -8,7 +8,6 @@ import time
 import random as rd
 import pyglet as pyg
 import pandas as pd
-# from utils import decorator
 
 
 class Experiment(pyg.EventLoop):
@@ -20,7 +19,6 @@ class Experiment(pyg.EventLoop):
 
     def on_draw(self):
         self.win.clear()
-        # Consider how to do this.
         self.current_trial.draw()
 
     def on_key_press(self, symbol, modifiers):
@@ -29,17 +27,7 @@ class Experiment(pyg.EventLoop):
             self.endtime = time.clock()
             self.response = key
             self.rt = self.endtime - self.starttime
-            # Need some sort of means of handling data output.
-            # Could use some sort of functools method (e.g., a partial?)
-            # to pass the response, RT, and any relevant properties of
-            # the stimulus/task to a global data logging utility, which
-            # can then get the rest of its arguments from the task or trial?
-            # handle_trial_data(handle_all_data, self.rt, self.response)
             self.win.clear()
-            # Should this indeed be a member, or should it refer to some
-            # external var? Hard to imagine the latter without making people
-            # code it themselves, but the former is not very fp.
-            next(self.task_gen)
 
 
 class Trial:
@@ -52,11 +40,6 @@ class Trial:
         # Virtual ish
         pass
         # No pun intended
-
-    # def time(self):
-    #     # Subclasses with run() methods should call Trial.time() to
-    #     # start the clock if timing is important.
-    #     self.starttime = time.clock()
 
 
 def generate_task(trials, **kwargs):
@@ -90,6 +73,8 @@ def run_task(*args, **kwargs):
     data_to_start = [[] for _ in range(len(colnames))]
     data = pd.DataFrame.from_dict(zip(colnames, data_to_start))
     for row in rows:
+        # I don't think this try...except format is needed, but I'm
+        # leaving it until it can be tested.
         try:
             exp.starttime = time.clock()
             next(gen)
@@ -104,5 +89,4 @@ def run_task(*args, **kwargs):
                 time.sleep(iti)
         except StopIteration:
             break
-    # Do something to output data
     return data
