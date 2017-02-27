@@ -34,6 +34,7 @@ class Trial:
     def __init__(self, stimulus, df, stimulus_col, **kwargs):
         self.stimulus = stimulus
         self.stimcol = stimulus_col
+        df.set_index(self.stimcol, inplace=True)
         self.row = df.loc[stimulus]
 
     def go(self):
