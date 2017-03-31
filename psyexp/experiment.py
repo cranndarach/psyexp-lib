@@ -55,7 +55,7 @@ def generate_task(trials, **kwargs):
 
 def run_task(*args, **kwargs):
     # If they pass a template, use it, and if they pass
-    # a series of named arguments instead, use them.
+    # a sequence of named arguments instead, use them.
     exp = kwargs["experiment"]
     rows = kwargs["rows"]
     template = kwargs.get("template", kwargs)
