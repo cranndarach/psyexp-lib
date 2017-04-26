@@ -55,13 +55,13 @@ def generate_task(trials, **kwargs):
 
 def run_task(*args, **kwargs):
     # If they pass a template, use it, and if they pass
-    # a sequence of named arguments instead, use them.
+    # a sequence of named arguments instead, use them:
     exp = kwargs["experiment"]
     rows = kwargs["rows"]
     template = kwargs.get("template", kwargs)
     # If they pass the generator as the first argument, use it;
     # if they pass it as a named argument or as part of the
-    # template, use that.
+    # template, use that:
     gen = args[0] if args else template["gen"]
     jitter = template.get("jitter", False)
     if jitter:
