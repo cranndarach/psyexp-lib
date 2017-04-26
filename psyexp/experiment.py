@@ -7,7 +7,8 @@ General task script.
 import time
 import random as rd
 import pyglet as pyg
-import pandas as pd
+import csv
+# import pandas as pd
 # import numpy as np
 
 
@@ -32,11 +33,12 @@ class Experiment(pyg.app.EventLoop):
 
 
 class Trial:
-    def __init__(self, stimulus, df, stimulus_col, **kwargs):
-        self.stimulus = stimulus
-        self.stimcol = stimulus_col
-        df.set_index(self.stimcol, inplace=True)
-        self.row = df.loc[stimulus]
+    def __init__(self, label, list_, **kwargs):
+        # self.stimulus = stimulus
+        # self.stimcol = stimulus_col
+        # df.set_index(self.stimcol, inplace=True)
+        # self.row = df.loc[stimulus]
+        self.item = list_[label]
 
     def go(self):
         # Virtual ish
@@ -46,7 +48,7 @@ class Trial:
 
 def generate_task(trials, **kwargs):
     # Add a list of rows to the template to be passed on:
-    kwargs["row"] = [trial.row for trial in trials]
+    kwargs["row"] = [trial.item for trial in trials]
     # Plop the generator and any arguments into a dict.
     return {"gen": (trial.go() for trial in trials),
             "template": kwargs
@@ -71,19 +73,25 @@ def run_task(*args, **kwargs):
         iti = template.get("iti", 0)/1000.0
         print("Warning: no ITI given. Defaulting to 0.") if not iti else None
     # while True:
-    colnames = rows[0].axes
-    data_to_start = [[] for _ in range(len(colnames))]
-    data = pd.DataFrame.from_dict(zip(colnames, data_to_start))
+    # colnames = rows[0].axes
+    # data_to_start = [[] for _ in range(len(colnames))]
+    # data = pd.DataFrame.from_dict(zip(colnames, data_to_start))
+    data = []
     for row in rows:
         # I don't think this try...except format is needed, but I'm
         # leaving it until it can be tested.
         try:
             exp.starttime = time.clock()
             next(gen)
-            trial_data = pd.Series(data=[exp.starttime, exp.endtime, exp.rt,
-                                         exp.response],
-                                   index=["StartTime", "EndTime", "RT",
-                                          "Response"])
+            # trial_data = pd.Series(data=[exp.starttime, exp.endtime, exp.rt,
+            #                              exp.response],
+            #                        index=["StartTime", "EndTime", "RT",
+            #                               "Response"])
+            trial_results = {"StartTime": exp.starttime,
+                          "EndTime": exp.endtime,
+                          "RT": exp.rt,
+                          "Response": exp.response}
+            trial_data = {**row, **trial_results}
             data.append(trial_data)
             if jitter:
                 time.sleep(rd.gauss(jitter_mean, jitter_sd))
