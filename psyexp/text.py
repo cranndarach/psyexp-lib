@@ -10,17 +10,12 @@ from psyexp.experiment import Trial
 import pyglet as pyg
 
 
-def generate_trials(stimulus_frame, stimulus_column, **kwargs):
-    stims = list(stimulus_frame.index.values)
-    trial_set = [TextTrial(stimulus=stim, df=stimulus_frame,
-                           stimulus_col=stimulus_column,
-                           **kwargs)
-                 for stim in stims]
-    return trial_set
+# def generate_trials(stimlist, **kwargs):
+#     trial_set = [TextTrial(stimulus=stim, **kwargs) for stim in stimlist]
+#     return trial_set
 
 
 class TextTrial(Trial):
-    # def __init__(self, stimulus, **kwargs):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Change the font sometime.
