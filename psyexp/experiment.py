@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-General task script.
+General experiment script.
 """
 
 import time
@@ -32,8 +32,10 @@ def run_task(task, **kwargs):
     # for stim in stimuli:
     for trial in gen:
         trial_results = next(gen)
+        print("trial completed")
         if trial_results:
-            trial_data = {**stim, **trial_results, **additional_fields}
+            trial_data = {**trial_results, **additional_fields}
+            print(trial_data)
             data.append(trial_data)
         window.clear()
         if jitter:
@@ -44,12 +46,12 @@ def run_task(task, **kwargs):
 
 
 def run_experiment(*sequence, **kwargs):
-    window = kwargs["window"]
+    # window = kwargs["window"]
 
-    @window.event
-    def on_draw():
-        win.clear()
-        draw()
+    # @window.event
+    # def on_draw():
+    #     win.clear()
+    #     draw()
 
     # So make a generator that runs each task
     tasks = (run_task(t, **kwargs) for t in sequence)
@@ -57,3 +59,8 @@ def run_experiment(*sequence, **kwargs):
     # Flatten the data list
     data = [line for task in nested_data for line in task]
     return data
+
+
+# Not sure how to handle this
+def start():
+    pyg.app.run()
