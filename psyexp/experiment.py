@@ -32,46 +32,12 @@ class Experiment(pyg.app.EventLoop):
             self.win.clear()
 
 
-class Trial:
-    def __init__(self, stimulus, **kwargs):
-        # I guess this is kind of useless except as a template right now
-        pass
-        # self.stimulus = stimulus
-        # self.stimcol = stimulus_col
-        # df.set_index(self.stimcol, inplace=True)
-        # self.row = df.loc[stimulus]
-        # label = kwargs["label"]
-        # self.stimulus = stimulus[label]
-
-    def go(self):
-        # Virtual ish
-        pass
-        # No pun intended
-
-
-# def generate_task(stimlist, trial_class, **kwargs):
-#     trial_set = [trial_class(stimulus=stim, **kwargs) for stim in stimlist]
-#     return {"gen": (trial.go() for trial in trials),
-#             "template": kwargs
-#             }
-#     return trial_set
-
-
 # Okay so instead of a class per trial type, instead there should be a
 # trial runner, and the parameters and everything can be passed around.
 # Then we can skip most steps and just pass the stim list to this.
 def generate_task(stimlist, trial_runner, **kwargs):
     gen = (trial_runner(stimulus=stim, **kwargs) for stim in stimlist)
     return gen, kwargs
-
-
-# def generate_task(trials, **kwargs):
-    # Add a list of rows to the template to be passed on:
-    # kwargs["stimuli"] = [trial.stimulus for trial in trials]
-    # Plop the generator and any arguments into a dict.
-    # return {"gen": (trial.go() for trial in trials),
-    #         "template": kwargs
-    #         }
 
 
 def run_task(*args, **kwargs):
@@ -91,10 +57,6 @@ def run_task(*args, **kwargs):
     else:
         iti = template.get("iti", 0)/1000.0
         print("Warning: no ITI given. Defaulting to 0.") if not iti else None
-    # while True:
-    # colnames = rows[0].axes
-    # data_to_start = [[] for _ in range(len(colnames))]
-    # data = pd.DataFrame.from_dict(zip(colnames, data_to_start))
     data = []
     for stim in stimuli:
         # I don't think this try...except format is needed, but I'm
