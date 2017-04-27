@@ -15,7 +15,7 @@ def load_list(filepath, **kwargs):
     # df = pd.read_csv(filepath, sep)
     # df.set_index(stimulus_col, inplace=True)
     with open(filepath) as stimcsv:
-        reader = csv.DictReader(stimcsv, delim=sep)
+        reader = csv.DictReader(stimcsv, delimiter=sep)
         for row in reader:
             stims.append(row)
     if kwargs.get("shuffle", False):

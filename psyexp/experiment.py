@@ -77,26 +77,22 @@ def run_task(*args, **kwargs):
     # data_to_start = [[] for _ in range(len(colnames))]
     # data = pd.DataFrame.from_dict(zip(colnames, data_to_start))
     data = []
-    for row in rows:
+    for stim in stimuli:
         # I don't think this try...except format is needed, but I'm
         # leaving it until it can be tested.
-        try:
-            exp.starttime = time.clock()
-            next(gen)
-            # trial_data = pd.Series(data=[exp.starttime, exp.endtime, exp.rt,
-            #                              exp.response],
-            #                        index=["StartTime", "EndTime", "RT",
-            #                               "Response"])
-            trial_results = {"StartTime": exp.starttime,
-                          "EndTime": exp.endtime,
-                          "RT": exp.rt,
-                          "Response": exp.response}
-            trial_data = {**row, **trial_results}
-            data.append(trial_data)
-            if jitter:
-                time.sleep(rd.gauss(jitter_mean, jitter_sd))
-            else:
-                time.sleep(iti)
-        except StopIteration:
-            break
+        # try:
+        exp.starttime = time.clock()
+        next(gen)
+        trial_results = {"StartTime": exp.starttime,
+                        "EndTime": exp.endtime,
+                        "RT": exp.rt,
+                        "Response": exp.response}
+        trial_data = {**stimulus, **trial_results}
+        data.append(trial_data)
+        if jitter:
+            time.sleep(rd.gauss(jitter_mean, jitter_sd))
+        else:
+            time.sleep(iti)
+        # except StopIteration:
+        #     break
     return data
