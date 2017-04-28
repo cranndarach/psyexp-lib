@@ -8,6 +8,7 @@ what's going on.
 
 import pyglet as pyg
 import psyexp.experiment as expt
+import random as rd
 import warnings
 import math
 import time
@@ -15,25 +16,32 @@ import time
 
 def present_text(stimulus, **kwargs):
     window = kwargs["window"]
-    stim_key = kwargs["stim_key"]
+    stim_label = kwargs["stim_label"]
     allowed_keys = kwargs.get("allowed_keys", [])
     norm_allowed_keys = [k.lower() for k in allowed_keys]
     keys_pressed = []
     duration = kwargs.get("duration", math.inf)
     additional_fields = kwargs.get("additional_fields", {})
-    # jitter = kwargs.get("jitter", False)
+    jitter = kwargs.get("jitter", False)
+    if jitter:
+        jitter_mean = kwargs["jitter_mean"]
+        jitter_sd = kwargs["jitter_sd"]
+        iti = rd.gauss(jitter_mean, jitter_sd)
+    else:
+        iti = kwargs.get("iti", 0)/1000.0
+        warnings.warn("No ITI given. Defaulting to 0.") if not iti else None
     # if jitter:
-    #     jitter_mean = kwargs["jitter_mean"]
-    #     jitter_sd = kwargs["jitter_sd"]
+    #     pyg.clock.schedule_once(window.clear, rd.gauss(jitter_mean, jitter_sd))
     # else:
-    #     iti = kwargs.get("iti", 0)/1000.0
-    #     warnings.warn("No ITI given. Defaulting to 0.") if not iti else None
+    #     pyg.clock.schedule_once(window.clear, iti)
     if duration >= 100:
         warnings.warn("Very long duration specified.\
                       Did you remember to use seconds?")
-    stim = pyg.text.Label(stimulus[stim_key],
+    stim = pyg.text.Label(stimulus[stim_label],
                           font_name="Courier New",
                           font_size=36,
+                          x=window.width//2,
+                          y=window.height//2,
                           anchor_x="center",
                           anchor_y="center")
 
@@ -41,12 +49,12 @@ def present_text(stimulus, **kwargs):
     stim.draw()
     # If this is handled synchronously, it shouldn't do the rest until it
     # times out or receives a key press.
-    pyg.clock.schedule_once(expt.timeout, duration)
+    pyg.clock.schedule_once(expt.timeout, delay=duration, **kwargs)
 
     @window.event
     def on_key_press(key, modifiers):
         print(key)
-        norm_key = pyg.key.symbol_string(key).lower()
+        norm_key = pyg.window.key.symbol_string(key).lower()
         if norm_key in norm_allowed_keys:
             keys_pressed.append(norm_key)
             pyg.clock.unschedule(expt.timeout)
@@ -55,7 +63,7 @@ def present_text(stimulus, **kwargs):
 
     @window.event
     def on_draw():
-        win.clear()
+        window.clear()
         stim.draw()
 
     end_time = time.clock()
@@ -70,5 +78,6 @@ def present_text(stimulus, **kwargs):
                      "RT": rt,
                      "Response": response}
     trial_data = {**stimulus, **trial_results, **additional_fields}
-    expt.wait_iti(**kwargs)
+    pyg.clock.schedule_once(expt.wait_iti, delay=iti, **kwargs)
+    # expt.wait_iti(**kwargs)
     return trial_data

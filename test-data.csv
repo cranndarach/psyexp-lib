@@ -1,0 +1,9 @@
+Condition,Stimulus,TrialID,EndTime,Response,StartTime,RT
+word,world,2,494.0,None,491.0,inf
+nonword,celorliss,7,498.0,None,498.0,inf
+word,hello,1,501.0,None,500.0,inf
+word,here,3,502.0,None,502.0,inf
+word,everyone,4,506.0,None,505.0,inf
+nonword,ddddd,5,508.0,None,507.0,inf
+nonword,speep,8,510.0,None,510.0,inf
+nonword,foobarbaz,6,513.0,None,513.0,inf

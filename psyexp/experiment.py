@@ -18,56 +18,23 @@ def generate_task(stimlist, trial_runner, **kwargs):
 
 def run_task(task, **kwargs):
     gen = task
-    # window = kwargs["window"]
-    # additional_fields = kwargs.get("additional_fields", {})
-    # data = []
-    data = [next(gen) for _ in gen]
-    # jitter = kwargs.get("jitter", False)
-    # if jitter:
-    #     jitter_mean = kwargs["jitter_mean"]
-    #     jitter_sd = kwargs["jitter_sd"]
-    # else:
-    #     iti = kwargs.get("iti", 0)/1000.0
-    #     print("Warning: no ITI given. Defaulting to 0.") if not iti else None
-
-    # for trial in gen:
-    # while True:
-        # trial_results = next(gen)
-        # print("trial completed")
-        # if trial_results:
-        #     trial_data = {**trial_results, **additional_fields}
-        #     print(trial_data)
-        #     data.append(trial_data)
-        # window.clear()
-        # if jitter:
-        #     time.sleep(rd.gauss(jitter_mean, jitter_sd))
-        # else:
-        #     # time.sleep(iti)
-        #     pyg.clock.schedule_once(continue, iti)
+    data = [trial for trial in gen]
     return data
 
 
 def run_experiment(*sequence, **kwargs):
     window = kwargs["window"]
-
-    # @window.event
-    # def on_draw():
-    #     win.clear()
-    #     draw()
-
-    # So make a generator that runs each task
     tasks = (run_task(t, **kwargs) for t in sequence)
-    nested_data = [next(tasks) for _ in tasks]
+    nested_data = [task for task in tasks]
     # Flatten the data list
     data = [line for task in nested_data for line in task]
-    window.close()
+    # window.close()
     return data
 
 
 # Not sure how to handle this
 def start():
     pyg.app.run()
-
 
 
 def end_trial(stimulus, start_time, end_time, key_pressed=None):
@@ -84,21 +51,12 @@ def end_trial(stimulus, start_time, end_time, key_pressed=None):
     return trial_data
 
 
-def timeout():
+def timeout(delay, **kwargs):
+    window = kwargs["window"]
     window.clear()
     return
 
 
-def wait_iti(**kwargs):
+def wait_iti(delay, **kwargs):
     window = kwargs["window"]
-    jitter = kwargs.get("jitter", False)
-    if jitter:
-        jitter_mean = kwargs["jitter_mean"]
-        jitter_sd = kwargs["jitter_sd"]
-    else:
-        iti = kwargs.get("iti", 0)/1000.0
-        warnings.warn("No ITI given. Defaulting to 0.") if not iti else None
-    if jitter:
-        pyg.clock.schedule_once(window.clear, rd.gauss(jitter_mean, jitter_sd))
-    else:
-        pyg.clock.schedule_once(window.clear, iti)
+    window.clear()

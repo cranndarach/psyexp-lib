@@ -14,7 +14,7 @@ params = {"jitter": True,
           "allowed_keys": ["Z", "slash"],
           "duration": 5,
           "window": window,
-          "stim_key": "Stimulus"}
+          "stim_label": "Stimulus"}
 
 ldt_task = expt.generate_task(wordlist, text.present_text, **params)
 # sys.exit(0)
