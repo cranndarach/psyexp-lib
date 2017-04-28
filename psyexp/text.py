@@ -7,6 +7,7 @@ what's going on.
 """
 
 import pyglet as pyg
+import psyexp.experiment as expt
 import warnings
 import math
 import time
@@ -19,6 +20,14 @@ def present_text(stimulus, **kwargs):
     norm_allowed_keys = [k.lower() for k in allowed_keys]
     keys_pressed = []
     duration = kwargs.get("duration", math.inf)
+    additional_fields = kwargs.get("additional_fields", {})
+    # jitter = kwargs.get("jitter", False)
+    # if jitter:
+    #     jitter_mean = kwargs["jitter_mean"]
+    #     jitter_sd = kwargs["jitter_sd"]
+    # else:
+    #     iti = kwargs.get("iti", 0)/1000.0
+    #     warnings.warn("No ITI given. Defaulting to 0.") if not iti else None
     if duration >= 100:
         warnings.warn("Very long duration specified.\
                       Did you remember to use seconds?")
@@ -28,41 +37,38 @@ def present_text(stimulus, **kwargs):
                           anchor_x="center",
                           anchor_y="center")
 
-    # I don't love defining the event handler for each trial, but I think
-    # it's the only way to constrain it to this scope.
-    # But figure out if it can at least be partly separated out, because
-    # it shouldn't be rewritten for every type of trial that requires a
-    # key press.
+    start_time = time.clock()
+    stim.draw()
+    # If this is handled synchronously, it shouldn't do the rest until it
+    # times out or receives a key press.
+    pyg.clock.schedule_once(expt.timeout, duration)
+
     @window.event
     def on_key_press(key, modifiers):
         print(key)
         norm_key = pyg.key.symbol_string(key).lower()
         if norm_key in norm_allowed_keys:
             keys_pressed.append(norm_key)
+            pyg.clock.unschedule(expt.timeout)
+            # expt.end_trial(stimulus, start_time, end_time,
+            #                key_pressed=keys_pressed[0])
 
     @window.event
     def on_draw():
         win.clear()
-        draw()
+        stim.draw()
 
-    start_time = time.clock()
-    stim.draw()
-    while time.clock()-start_time <= duration:
-        # Any better way to signal a press to the loop?
-        if keys_pressed:
-            break
-    else:
-        rt = math.inf
     end_time = time.clock()
     # Convert to msec
     start_time = round(start_time, 3) * 1000
     end_time = round(end_time, 3) * 1000
     # If rt wasn't defined by timing out, define it now.
-    rt = end_time - start_time if not rt else rt
     response = keys_pressed[0] if keys_pressed else "None"
+    rt = end_time - start_time if (response != "None") else math.inf
     trial_results = {"StartTime": start_time,
                      "EndTime": end_time,
                      "RT": rt,
                      "Response": response}
-    trial_data = {**stimulus, **trial_results}
+    trial_data = {**stimulus, **trial_results, **additional_fields}
+    expt.wait_iti(**kwargs)
     return trial_data
