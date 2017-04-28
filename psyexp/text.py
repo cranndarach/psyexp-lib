@@ -19,10 +19,11 @@ def present_text(stimulus, **kwargs):
     stim_label = kwargs["stim_label"]
     allowed_keys = kwargs.get("allowed_keys", [])
     norm_allowed_keys = [k.lower() for k in allowed_keys]
-    keys_pressed = []
+    # keys_pressed = []
     duration = kwargs.get("duration", math.inf)
     additional_fields = kwargs.get("additional_fields", {})
     jitter = kwargs.get("jitter", False)
+    trial_results = {}
     if jitter:
         jitter_mean = kwargs["jitter_mean"]
         jitter_sd = kwargs["jitter_sd"]
@@ -53,10 +54,13 @@ def present_text(stimulus, **kwargs):
 
     @window.event
     def on_key_press(key, modifiers):
-        print(key)
+        print(pyg.window.key.symbol_string(key))
         norm_key = pyg.window.key.symbol_string(key).lower()
         if norm_key in norm_allowed_keys:
-            keys_pressed.append(norm_key)
+            # keys_pressed.append(norm_key)
+            result = expt.end_trial(stimulus, start_time, end_time=time.clock,
+                                    response=norm_key)
+            trial_results.update(result)
             pyg.clock.unschedule(expt.timeout)
             # expt.end_trial(stimulus, start_time, end_time,
             #                key_pressed=keys_pressed[0])
@@ -66,18 +70,18 @@ def present_text(stimulus, **kwargs):
         window.clear()
         stim.draw()
 
-    end_time = time.clock()
+    # end_time = time.clock()
     # Convert to msec
-    start_time = round(start_time, 3) * 1000
-    end_time = round(end_time, 3) * 1000
+    # start_time = round(start_time, 3) * 1000
+    # end_time = round(end_time, 3) * 1000
     # If rt wasn't defined by timing out, define it now.
-    response = keys_pressed[0] if keys_pressed else "None"
-    rt = end_time - start_time if (response != "None") else math.inf
-    trial_results = {"StartTime": start_time,
-                     "EndTime": end_time,
-                     "RT": rt,
-                     "Response": response}
-    trial_data = {**stimulus, **trial_results, **additional_fields}
+    # response = keys_pressed[0] if keys_pressed else "None"
+    # rt = end_time - start_time if (response != "None") else math.inf
+    # trial_results = {"StartTime": start_time,
+    #                  "EndTime": end_time,
+    #                  "RT": rt,
+    #                  "Response": response}
+    trial_data = {**trial_results, **additional_fields}
     pyg.clock.schedule_once(expt.wait_iti, delay=iti, **kwargs)
     # expt.wait_iti(**kwargs)
     return trial_data

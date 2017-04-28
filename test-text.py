@@ -12,7 +12,7 @@ params = {"jitter": True,
           "jitter_mean": 400,
           "jitter_sd": 50,
           "allowed_keys": ["Z", "slash"],
-          "duration": 5,
+          "duration": 1,
           "window": window,
           "stim_label": "Stimulus"}
 
